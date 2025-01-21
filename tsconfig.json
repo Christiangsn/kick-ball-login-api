@@ -1,0 +1,15 @@
+{
+    "compilerOptions": 
+    {
+       "target": "ESNext",
+       "moduleResolution": "node",
+       "allowImportingTsExtensions": true,
+       "rewriteRelativeImportExtensions": true,
+       "verbatimModuleSyntax": true,
+       "experimentalDecorators": true,
+       "typeRoots": [
+         "./node_modules/@types",
+         "./src/@types/logger.d.ts"
+       ]
+    }
+} 
