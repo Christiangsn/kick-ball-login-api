@@ -8,8 +8,9 @@ export class CryptoDomainService implements IDomainService<string>
   private readonly __secretKey__: string = 'HS256'
 
   public constructor (
-        private readonly userId: string
-  ) {}
+    private readonly userId: string) 
+  {
+  }
 
   private createToken(): string
   {

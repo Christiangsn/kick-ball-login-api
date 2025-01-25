@@ -1,8 +1,7 @@
 import { ControllerEntity } from '@christiangsn/templates_shared'
 
-import type { SignUpWithGoogleDTO } from '../dto/sign-up-with-google.dto'
+import type { SignUpDTO } from '../dto/sign-up'
 
-export class SignUpController extends ControllerEntity<SignUpWithGoogleDTO, { message: string, token: string }>
+export class SignUpController extends ControllerEntity<SignUpDTO, { message: string, token: string }>
 {
- 
 }

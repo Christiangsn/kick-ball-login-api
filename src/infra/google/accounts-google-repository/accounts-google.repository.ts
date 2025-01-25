@@ -1,7 +1,8 @@
 import { OAuth2Client } from 'google-auth-library'
 
+import type { OAuthGoogleEnv } from '../env/oauth-google.env'
+
 import type { ISignUpExternalRepository } from './../../../domain/contracts/signup-external-repo.contract'
-import type { OAuthGoogleEnv } from './oauth-google.env'
 
 export class AccountsGoogleRepository implements ISignUpExternalRepository<string>
 {

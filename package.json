@@ -3,20 +3,21 @@
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --env-file='.env' ./node_modules/.bin/ts-node-dev src/main/bootstrap/main.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@christiangsn/templates_shared": "^0.0.8",
+    "@christiangsn/templates_shared": "^0.0.18",
     "dayjs": "^1.11.13",
+    "env-var": "^7.5.0",
     "google-auth-library": "^9.15.0",
     "mongodb": "^6.12.0",
     "mongoose": "^8.9.5",
-    "mongoose-decorators-ts": "^1.4.0",
-    "phone": "^3.1.57"
+    "phone": "^3.1.57",
+    "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
@@ -25,6 +26,8 @@
     "eslint": "^9.15.0",
     "eslint-plugin-import-helpers": "^2.0.1",
     "eslint-plugin-unused-imports": "^4.1.4",
+    "mongoose-decorators-ts": "^1.4.0",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.15.0"
   }

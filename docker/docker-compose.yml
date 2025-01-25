@@ -1,0 +1,9 @@
+
+services:
+  users-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: christiangns/flow-users-api:latest
+    env_file:
+      - .env.docker

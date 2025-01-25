@@ -1,20 +1,23 @@
-import { schemaDef, required, unique, field, dateField, ModelFromSchemaDef } from "mongoose-decorators-ts";
-import { EnumGender } from "../../../domain/entities/user";
-import { connection, Connection } from "mongoose";
+import { schemaDef, required, field, dateField } from 'mongoose-decorators-ts'
+
+import { EnumGender } from '../../../domain/entities/user'
 
 @schemaDef({
-    name: 'users'
+  name: 'users'
 })
 export class UserSchema
 {
     @required({ type: String, unique: true, index: true })
-    public id!: string
+  public id!: string
 
     @required({ type: String })
     public email!: string
 
     @required({ type: String })
     public password!: string
+
+    @required({ type: String })
+    public cryptoIVPassword!: Buffer<ArrayBufferLike> | string
 
     @required({ type: String })
     public name!: string
@@ -25,7 +28,7 @@ export class UserSchema
     @required({ type: String })
     public dateOfBirth!: string
 
-    @field({ type: EnumGender, enum: EnumGender, default: EnumGender.PreferNotToSay  })
+    @field({ type: String, enum: EnumGender, default: EnumGender.PreferNotToSay  })
     public gender!: EnumGender
 
     @field({ type: Boolean, default: false })
@@ -40,7 +43,3 @@ export class UserSchema
     @dateField({ type: Date, default: Date.now })
     public updatedAt?: Date
 }
-
-// export function getModel(conn: Connection = connection) {
-//     return ModelFromSchemaDef<typeof UserSchema, UserSchema>(UserSchema, conn);
-// }

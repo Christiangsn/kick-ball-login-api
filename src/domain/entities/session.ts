@@ -1,9 +1,10 @@
-import { BaseError, DomainEntity } from "@christiangsn/templates_shared"
-import type { ENumSignUpTypesLogin } from "../contracts/signup-types-login"
-import type { IDomainService } from "../services/random-code/random-code.domain-service"
-import { CryptoDomainService } from "../services/crypto/crypto.domain-service"
+import { BaseError, DomainEntity } from '@christiangsn/templates_shared'
 
-type IUserSession = 
+import type { ENumSignUpTypesLogin } from '../contracts/signup-types-login'
+import { CryptoDomainService } from '../services/crypto/crypto.domain-service'
+import type { IDomainService } from '../services/random-code/random-code.domain-service'
+
+export type IUserSession = 
 {
     userId: string
     tokenAssociated: string
@@ -14,19 +15,45 @@ type IUserSession =
 
 export class SessionEntity extends DomainEntity<IUserSession>
 {
-    private readonly token: string = ''
-    protected check(): null | BaseError 
-    {
-        throw new Error("Method not implemented.")
-    }
+  private token: string = ''
+  protected check(): null | BaseError 
+  {
+    return null
+  }
 
-    public generateNewToken(tokenService: IDomainService<string> = new CryptoDomainService(this.getValue().userId))
-    {
-        return tokenService.handler()
-    }
+  public generateNewToken(tokenService: IDomainService<string> = new CryptoDomainService(this.getProps().userId))
+  {
+    this.token = tokenService.handler()
+  }
 
-    public getToken()
-    {
-        return this.token
-    }
+  public getToken()
+  {
+    return this.token
+  }
+
+  public getTokenAssociated()
+  {
+    return this.token
+  }
+
+  public getUserId()
+  {
+    return this.getProps().userId
+  }
+
+  public getSystemAssociated()
+  {
+    return this.getProps().SystemAssociated
+  }
+
+  public getUserAgent()
+  {
+    return this.getProps().userAgent
+  }
+
+  public getIpAddress()
+  {
+    return this.getProps().ipAddress
+  }
+    
 }

@@ -1,5 +1,5 @@
 import { BaseError, DomainEntity } from '@christiangsn/templates_shared'
-import * as dayjs from 'dayjs'
+import dayjs from 'dayjs'
 
 import { RandomCodeDomainService, type IDomainService } from '../services/random-code/random-code.domain-service'
 
@@ -11,11 +11,11 @@ export enum EnumVerificationType
 
 export type VerificationProps =
 {
-    userId: string;
-    verificationCode?: string;
-    verificationType: EnumVerificationType;
-    isVerify?: boolean;
-    expiresAt?: number;
+  userId: string;
+  verificationCode?: string;
+  verificationType?: EnumVerificationType;
+  isVerify?: boolean;
+  expiresAt?: number;
 }
 
 export class VerificationEntity extends DomainEntity<VerificationProps> 
@@ -27,27 +27,27 @@ export class VerificationEntity extends DomainEntity<VerificationProps>
 
   public getUserId(): string
   {
-    return this.getValue().userId
+    return this.getProps().userId
   }
 
   public getVerificationCode(generatorCode: IDomainService<string> =  new RandomCodeDomainService()): string
   {
-    return this.getValue().verificationCode ?? generatorCode.handler()
+    return this.getProps().verificationCode ?? generatorCode.handler()
   }
 
   public getVerificationType(): EnumVerificationType
   {
-    return this.getValue().verificationType
+    return this.getProps().verificationType
   }
 
   public getIsVerified(): boolean
   {
-    return this.getValue()?.isVerify ?? false
+    return this.getProps()?.isVerify ?? false
   }
 
   public getExpiresAt(): number
   {
-    return this.getValue()?.expiresAt ?? dayjs(new Date()).add(120, 'minutes').unix()
+    return this.getProps()?.expiresAt ?? dayjs(new Date()).add(120, 'minutes').unix()
   }
 
   public isExpired()

@@ -34,47 +34,46 @@ export class UserEntity extends DomainEntity<UserEntityProps>
     
   public setVerified(): void
   {
-    this.getValue().isVerified = true
+    this.getProps().isVerified = true
   }
 
   public getGender(): EnumGender
   {
-    return this.getValue()?.gender ?? EnumGender.PreferNotToSay
+    return this.getProps()?.gender ?? EnumGender.PreferNotToSay
   }
 
   public getIsVerified(): boolean
   {
-    return this.getValue()?.isVerified ?? false
+    return this.getProps()?.isVerified ?? false
   }
 
   public getIsActive(): boolean
   {
-    return this.getValue()?.isActive?? true
+    return this.getProps()?.isActive?? true
   }
 
   public getPassword(): PasswordValueObject
   {
-    return this.getValue().password
+    return this.getProps().password
   }
 
   public getPhoneNumber(): PhoneNumberValueObject | null
   {
-    return this.getValue()?.phoneNumber ?? null
+    return this.getProps()?.phoneNumber ?? null
   }
 
   public getFullName(): string
   {
-    return this.getValue()?.fullName
+    return this.getProps()?.fullName
   }
 
   public getEmail(): EmailValueObject
   {
-    return this.getValue()?.email
+    return this.getProps()?.email
   }
 
   public getDateOfBirth(): DateOfBirthValueObject
   {
-    return this.getValue()?.dateOfBirth
+    return this.getProps()?.dateOfBirth
   }
-
 }

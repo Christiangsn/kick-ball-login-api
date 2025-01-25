@@ -1,15 +1,20 @@
 {
     "compilerOptions": 
     {
-       "target": "ESNext",
-       "moduleResolution": "node",
-       "allowImportingTsExtensions": true,
-       "rewriteRelativeImportExtensions": true,
-       "verbatimModuleSyntax": true,
+      "target": "ESNext",
+      "module": "CommonJS",
+      "moduleResolution": "node",
+      "outDir": "./bin",
+      "baseUrl": "./",
        "experimentalDecorators": true,
+       "esModuleInterop": true,
+       "allowSyntheticDefaultImports": true,
+       "skipLibCheck": true,
        "typeRoots": [
          "./node_modules/@types",
          "./src/@types/logger.d.ts"
        ]
-    }
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules", "bin"]
 } 
