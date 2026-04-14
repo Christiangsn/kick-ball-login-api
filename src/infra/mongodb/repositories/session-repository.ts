@@ -16,13 +16,13 @@ export class SessionRepository implements ISessionRepository
     const session = await this.modelConn.findOne<SessionSchema>({ tokenAssociated: token })
     if (!session) return null
 
-    return SessionEntity.create({
+    return SessionEntity.Create({
       userId: session.userId,
       tokenAssociated: session.tokenAssociated,
       SystemAssociated: session.SystemAssociated,
       userAgent: session.userAgent,
       ipAddress: session.ipAddress,
-    }).getResult()
+    }).getResult().getOutput().payload
   }
     
   public async save(model: SessionEntity): Promise<void> 
@@ -44,13 +44,13 @@ export class SessionRepository implements ISessionRepository
     const session = await this.modelConn.findById<SessionSchema>(id)
     if (!session) return null
 
-    return SessionEntity.create({
+    return SessionEntity.Create({
       userId: session.userId,
       tokenAssociated: session.tokenAssociated,
       SystemAssociated: session.SystemAssociated,
       userAgent: session.userAgent,
       ipAddress: session.ipAddress,
-    }).getResult()
+    }).getResult().getOutput().payload
   }
   public async update(id: string, fields: Partial<SessionEntity>): Promise<void> 
   {

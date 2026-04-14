@@ -1,3 +1,4 @@
+import './register-paths'
 import 'reflect-metadata'
 import '@christiangsn/templates_shared/build/log'
 

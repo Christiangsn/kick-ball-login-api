@@ -1,0 +1,44 @@
+{
+    "compilerOptions": {
+      "experimentalDecorators": true,
+      "allowSyntheticDefaultImports": true,
+      "target": "ESNext",
+      "sourceMap": false,
+      "outDir": "./build",
+      "baseUrl": "./src",
+      "incremental": false,
+      "skipLibCheck": true,
+      "emitDecoratorMetadata": true,
+      "declaration": true,
+      "declarationMap": true,
+      "noImplicitAny": false,
+      "removeComments": true,
+      "useDefineForClassFields": false,
+      "strictBindCallApply": false,
+      "forceConsistentCasingInFileNames": false,
+      "noFallthroughCasesInSwitch": false,
+      "moduleResolution": "node",
+      "typeRoots": [
+        "./node_modules/@types",
+        "./src/@types"
+      ],
+      "lib": ["ESNext", "DOM"],
+      "module": "CommonJS",
+      "esModuleInterop": true,
+      "resolveJsonModule": true,
+      "strict": false,
+      "allowJs": true,
+      "paths": {
+        "@main/*": ["main/*"],
+        "@app/*": ["app/*"],
+        "@domain/*": ["domain/*"],
+        "@shared/*": ["shared/*"],
+        "@infra/*": ["infra/*"],
+        "@application/*": ["application/*"]
+      }
+    },
+    "include": [
+      "src/**/*.ts",
+      "src/**/*.json"
+    ]
+  }

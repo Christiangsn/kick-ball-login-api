@@ -5,7 +5,6 @@ export class Translatei18nFactory extends FactoryAdapter<I18nLocales>
 {
     protected createInstance(): I18nLocales
     {
-        const path = process.cwd() + "/public/langs"
-        return new I18nLocales(path)
+        return new I18nLocales()
     }
 }

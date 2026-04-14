@@ -29,13 +29,13 @@ export class VerificationRepository implements IVerificationRepository
     const verification = await this.modelConn.findById<VerificationSchema>(id)
     if (!verification) return null
 
-    return VerificationEntity.create({
+    return VerificationEntity.Create({
       userId: verification.userId,
       verificationCode: verification.verificationCode,
       verificationType: verification.verificationType,
       isVerify: verification.isVerify,
       expiresAt: verification.expiresAt
-    }).getResult()
+    }).getResult().getOutput().payload
   }
 
   public async update(id: string, fields: Partial<VerificationEntity>): Promise<void> 

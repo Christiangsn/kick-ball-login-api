@@ -1,5 +1,5 @@
 import { required, schemaDef } from 'mongoose-decorators-ts'
-import { ITermsProps } from 'src/domain/entities/terms'
+import { ITermsProps } from '@domain/entities/terms'
 
 @schemaDef({
   name: 'terms'

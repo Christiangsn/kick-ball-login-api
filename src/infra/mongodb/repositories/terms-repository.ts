@@ -1,5 +1,5 @@
 import type { Document, Model } from 'mongoose'
-import { ITermsRepository } from 'src/domain/contracts/terms-repo.contract'
+import { ITermsRepository } from '@domain/contracts/terms-repo.contract'
 import { TermsEntity } from '../../../domain/entities/terms'
 
 import { TermsSchema } from '../schema/term-schema'

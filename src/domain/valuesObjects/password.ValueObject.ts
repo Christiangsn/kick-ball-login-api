@@ -14,10 +14,11 @@ export class PasswordValueObject extends ValueObjectEntity<TPasswordValueObjectP
 
   protected check(): null | BaseError<DictionariesDomain.TDictionariesDomainErrors>
   {
-    const passIsAlreadyCryptographic = this.checkCryptographic(this.getValue("password"))
+    const password = this.getValue<string>('password')
+    const passIsAlreadyCryptographic = this.checkCryptographic(password)
     if (passIsAlreadyCryptographic) return null
 
-    const pass = this.getValue("password")?.length ?? 0
+    const pass = password.length
     if (pass < 8)
     {
       return new DomainErrors.InvalidPasswordError(
@@ -27,7 +28,7 @@ export class PasswordValueObject extends ValueObjectEntity<TPasswordValueObjectP
       )
     }
 
-    if (!/[A-Z]/.test(this.getValue("password")))
+    if (!/[A-Z]/.test(password))
     {
       return new DomainErrors.InvalidPasswordError(
         "Password must contain at least one uppercase letter",
@@ -36,7 +37,7 @@ export class PasswordValueObject extends ValueObjectEntity<TPasswordValueObjectP
       )
     }
 
-    if (!/[a-z]/.test(this.getValue("password")))
+    if (!/[a-z]/.test(password))
     {
       return new DomainErrors.InvalidPasswordError(
         "Password must contain at least one lowercase letter",
@@ -45,7 +46,7 @@ export class PasswordValueObject extends ValueObjectEntity<TPasswordValueObjectP
       )
     }
 
-    if (!/[0-9]/.test(this.getValue("password")))
+    if (!/[0-9]/.test(password))
     {
       return new DomainErrors.InvalidPasswordError(
         "Password must contain at least one number",
@@ -54,7 +55,7 @@ export class PasswordValueObject extends ValueObjectEntity<TPasswordValueObjectP
       )
     }
 
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(this.getValue("password")))
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password))
     {
       return new DomainErrors.InvalidPasswordError(
         "Password must contain at least one special character",
