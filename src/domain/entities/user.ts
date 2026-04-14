@@ -1,33 +1,37 @@
-import { BaseError, DomainEntity } from '@christiangsn/templates_shared'
+import { BaseError, DomainEntity, ILanguages } from '@christiangsn/templates_shared'
 
 import { DateOfBirthValueObject } from '../valuesObjects/dateOfBirth.ValueObject'
 import { EmailValueObject } from '../valuesObjects/email.valueObjec'
 import { PasswordValueObject } from '../valuesObjects/password.ValueObject'
 import { PhoneNumberValueObject } from '../valuesObjects/phoneNumber.valueObject'
+import { DictionariesDomain } from '@domain/responses/dictionaries'
 
 export enum EnumGender
 {
-    Male = 'Male',
-    Female = 'Female',
-    Other = 'Other',
-    PreferNotToSay = 'Prefer not to say'
+  Male = 'Male',
+  Female = 'Female',
+  Other = 'Other',
+  PreferNotToSay = 'Prefer not to say'
 }
 
 export type UserEntityProps =
 {
-    email: EmailValueObject;
-    password: PasswordValueObject;
-    phoneNumber: PhoneNumberValueObject | null;
-    fullName: string;
-    dateOfBirth: DateOfBirthValueObject;
-    gender: EnumGender | null;
-    isVerified: boolean;
-    isActive: boolean;
+  email: EmailValueObject;
+  password: PasswordValueObject;
+  lang: ILanguages.LanguageValues | undefined;
+  phoneNumber: PhoneNumberValueObject | null;
+  fullName: string;
+  dateOfBirth: DateOfBirthValueObject;
+  gender: EnumGender | null;
+  isVerified: boolean;
+  isActive: boolean;
+  pictureUrl?: string;
+  workerSpaceAccessIds?: string[];
 }
 
-export class UserEntity extends DomainEntity<UserEntityProps>
+export class UserEntity extends DomainEntity<UserEntityProps, DictionariesDomain.TDictionariesDomainErrors>
 {
-  protected check(): null | BaseError 
+  protected check(): null | BaseError<DictionariesDomain.TDictionariesDomainErrors>
   {
     return null
   }

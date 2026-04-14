@@ -3,10 +3,11 @@ import type { IHttpRootServer } from '@christiangsn/templates_shared/build/inter
 
 import { HttpServer } from '../../../infra/httpServer/http-server'
 import { HttpServerConnectionFactory } from '../connections/httpServerConnectionFactory'
+import { Server } from 'http'
 
-export class HttpServerFactory extends FactoryAdapter<IHttpRootServer.Server>
+export class HttpServerFactory extends FactoryAdapter<IHttpRootServer.Server<Server>>
 {
-  protected createInstance(): IHttpRootServer.Server 
+  protected createInstance(): IHttpRootServer.Server<Server>
   {
     return new HttpServer(HttpServerConnectionFactory.getCompose())
   }

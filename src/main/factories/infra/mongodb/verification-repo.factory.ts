@@ -4,13 +4,14 @@ import { MongoDbConnectionFactory } from "../../connections/mongodb-connectionFa
 import type { Mongoose } from "mongoose";
 import { VerificationRepository } from "../../../../infra/mongodb/repositories/verification-repository";
 import { VerificationSchema } from "../../../../infra/mongodb/schema/verification-schema";
+import { IVerificationRepository } from "@domain/contracts";
 
-export class VerificationRepoFactory extends FactoryAdapter<VerificationRepository>
+export class VerificationRepoFactory extends FactoryAdapter<IVerificationRepository>
 {
-    protected createInstance(): VerificationRepository 
+    protected createInstance(): IVerificationRepository 
     {
         const model = ModelFromSchemaDef<typeof VerificationSchema, VerificationSchema>(VerificationSchema, MongoDbConnectionFactory.getCompose().getInstance<Mongoose>().connection);
-        return new VerificationRepository(model)
+        return new VerificationRepository(model) as any
     }
 }
 

@@ -1,0 +1,13 @@
+{
+    "not_accepted_terms": "Terms not accepted",
+    "invalid_date_format": "Invalid date format",
+    "invalid_email": "Invalid email",
+    "invalid_password": "Invalid password",
+    "invalid_phone_number": "Invalid phone number",
+    "mail": {
+        "welcome": {
+            "subject": "Welcome to Fusion Flow",
+            "text": "Hello {{name}},\n\nWelcome to Fusion Flow! We're excited to have you on board.\n\nBest regards,\nThe Fusion Flow Team"
+        }
+    }
+}

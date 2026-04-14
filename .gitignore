@@ -18,3 +18,6 @@ package-lock.json
 bin
 .bin
 .DS_Store
+bin
+node_modules
+package-lock.json

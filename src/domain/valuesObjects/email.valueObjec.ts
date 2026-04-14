@@ -1,25 +1,28 @@
-import { BaseError, ValueObjectEntity } from '@christiangsn/templates_shared'
+import { BaseError, Languages, ValueObjectEntity } from '@christiangsn/templates_shared'
 
-import { InvalidEmailError } from '../errors/invalidEmailError'
+import { DictionariesDomain } from '@domain/responses/dictionaries';
 
-type ValueObjectEntityProps = {
-    value: string;
-}
+import { DomainErrors } from '@domain/responses/errors';
 
-export class EmailValueObject extends ValueObjectEntity<ValueObjectEntityProps>
+export type EmailValueObjectEntityProps = {
+  email: string
+};
+
+export class EmailValueObject extends ValueObjectEntity<EmailValueObjectEntityProps, DictionariesDomain.TDictionariesDomainErrors>
 {
-  protected check(): null | BaseError
+  protected check(): null | BaseError<DictionariesDomain.TDictionariesDomainErrors>
   {
-    if (!this.getProps().value.match(/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/))
+    if (!this.getValue<string>('email').match(/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/))
     {
-      return new InvalidEmailError()
+      const lang: Languages.LanguageValues = this.getValue('lang') ?? Languages.enUS.value
+      
+      return new DomainErrors.InvalidEmailError(
+        "Invalid email format",
+        "The e-mail informed is invalid",
+        lang
+      )
     }
-
     return null
   }
 
-  public getValue(): string
-  {
-    return this.getProps().value
-  }
 }

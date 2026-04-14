@@ -7,9 +7,22 @@ import type { SessionSchema } from '../schema/session-schema'
 export class SessionRepository implements ISessionRepository
 {
   public constructor(
-        private readonly modelConn: Model<Document<SessionSchema, any, any>>,
+    private readonly modelConn: Model<Document<SessionSchema, any, any>>,
   )
   {
+  }
+  public async findoByToken(token: string): Promise<SessionEntity | null>
+  {
+    const session = await this.modelConn.findOne<SessionSchema>({ tokenAssociated: token })
+    if (!session) return null
+
+    return SessionEntity.create({
+      userId: session.userId,
+      tokenAssociated: session.tokenAssociated,
+      SystemAssociated: session.SystemAssociated,
+      userAgent: session.userAgent,
+      ipAddress: session.ipAddress,
+    }).getResult()
   }
     
   public async save(model: SessionEntity): Promise<void> 
@@ -25,6 +38,7 @@ export class SessionRepository implements ISessionRepository
     await session.save()
     return
   }
+
   public async findOne(id: string): Promise<SessionEntity> 
   {
     const session = await this.modelConn.findById<SessionSchema>(id)

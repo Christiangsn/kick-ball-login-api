@@ -13,23 +13,28 @@ import { UserSchema } from '../schema/user-schema'
 export class UserRepository implements IUserRepository
 {
   public constructor (
-        private readonly modelConn: Model<Document<UserSchema, any, any>>,
-        private readonly mapper: UserMapper,
+      private readonly modelConn: Model<Document<UserSchema, any, any>>,
+      private readonly mapper: UserMapper,
   ) {}
 
   public async findByEmail(email: string): Promise<UserEntity | null> {
-    throw new Error('Method not implemented.')
+    const user = await this.modelConn.findOne<UserSchema>({ email: email.toLowerCase() })
+    if (!user) return null
+    return this.mapper.toUserEntity(user)
   }
 
   public async save(model: UserEntity): Promise<void> 
   {
+    model.getPassword().encryptPassword()
     const user = this.mapper.toUserSchema(model)
     await new this.modelConn(user).save()
   }
 
   public async findOne(id: string): Promise<UserEntity | undefined> 
   {
-    const user = await this.modelConn.findById<UserSchema>(id)
+    const user = await this.modelConn.findOne<UserSchema>({
+      id
+    })
     if (!user) return undefined
     return this.mapper.toUserEntity(user)
   }

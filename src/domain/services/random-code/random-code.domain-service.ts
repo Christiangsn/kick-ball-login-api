@@ -1,6 +1,6 @@
 export interface IDomainService<T>
 {
-    handler: () => T
+  handler: () => T
 }
 
 export class RandomCodeDomainService implements IDomainService<string>

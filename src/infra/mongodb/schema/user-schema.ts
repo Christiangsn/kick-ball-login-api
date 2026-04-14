@@ -17,7 +17,7 @@ export class UserSchema
     public password!: string
 
     @required({ type: String })
-    public cryptoIVPassword!: Buffer<ArrayBufferLike> | string
+    public cryptoIVPassword!: string
 
     @required({ type: String })
     public name!: string

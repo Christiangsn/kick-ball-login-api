@@ -2,25 +2,26 @@ import { BaseError, DomainEntity } from '@christiangsn/templates_shared'
 import dayjs from 'dayjs'
 
 import { RandomCodeDomainService, type IDomainService } from '../services/random-code/random-code.domain-service'
+import { DictionariesDomain } from '@domain/responses/dictionaries';
 
 export enum EnumVerificationType
 {
-    Email = 'Email',
-    Phone = 'Phone'
+  Email = 'Email',
+  Phone = 'Phone'
 }
 
 export type VerificationProps =
 {
   userId: string;
-  verificationCode?: string;
-  verificationType?: EnumVerificationType;
-  isVerify?: boolean;
-  expiresAt?: number;
+  verificationCode: string | undefined;
+  verificationType: EnumVerificationType | undefined;
+  isVerify: boolean;
+  expiresAt: number | undefined;
 }
 
-export class VerificationEntity extends DomainEntity<VerificationProps> 
+export class VerificationEntity extends DomainEntity<VerificationProps, DictionariesDomain.TDictionariesDomainErrors> 
 {
-  protected check(): null | BaseError
+  protected check(): null | BaseError<DictionariesDomain.TDictionariesDomainErrors>
   {
     return null
   }
@@ -37,7 +38,7 @@ export class VerificationEntity extends DomainEntity<VerificationProps>
 
   public getVerificationType(): EnumVerificationType
   {
-    return this.getProps().verificationType
+    return this.getProps().verificationType ?? EnumVerificationType.Email
   }
 
   public getIsVerified(): boolean

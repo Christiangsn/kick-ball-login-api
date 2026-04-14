@@ -3,6 +3,7 @@ import { BaseError, DomainEntity } from '@christiangsn/templates_shared'
 import type { ENumSignUpTypesLogin } from '../contracts/signup-types-login'
 import { CryptoDomainService } from '../services/crypto/crypto.domain-service'
 import type { IDomainService } from '../services/random-code/random-code.domain-service'
+import { DictionariesDomain } from '@domain/responses/dictionaries'
 
 export type IUserSession = 
 {
@@ -13,10 +14,10 @@ export type IUserSession =
     ipAddress: string
 }
 
-export class SessionEntity extends DomainEntity<IUserSession>
+export class SessionEntity extends DomainEntity<IUserSession, DictionariesDomain.TDictionariesDomainErrors>
 {
   private token: string = ''
-  protected check(): null | BaseError 
+  protected check(): null | BaseError<DictionariesDomain.TDictionariesDomainErrors>
   {
     return null
   }

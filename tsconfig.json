@@ -5,15 +5,24 @@
       "module": "CommonJS",
       "moduleResolution": "node",
       "outDir": "./bin",
-      "baseUrl": "./",
-       "experimentalDecorators": true,
-       "esModuleInterop": true,
-       "allowSyntheticDefaultImports": true,
-       "skipLibCheck": true,
+      "baseUrl": "./src",
+      "experimentalDecorators": true,
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "skipLibCheck": true,
+      "ignoreDeprecations": "6.0",
        "typeRoots": [
          "./node_modules/@types",
          "./src/@types/logger.d.ts"
-       ]
+       ],
+      "paths": {
+        "@main/*": ["main/*"],
+        "@app/*": ["app/*"],
+        "@domain/*": ["domain/*"],
+        "@shared/*": ["shared/*"],
+        "@infra/*": ["infra/*"],
+        "@application/*": ["application/*"]
+      }
     },
     "include": ["src/**/*.ts"],
     "exclude": ["node_modules", "bin"]

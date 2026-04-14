@@ -1,41 +1,66 @@
 import { BaseError, ValueObjectEntity } from '@christiangsn/templates_shared'
+
 import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto'
+import { DictionariesDomain } from '@domain/responses/dictionaries';
+import { DomainErrors } from '@domain/responses/errors';
 
-import { InvalidPasswordError } from '../errors/invalidPasswordError'
 
-export class PasswordValueObject extends ValueObjectEntity<{ value: string, iv?: string | Buffer<ArrayBufferLike> }>
+type TPasswordValueObjectProps = { password: string, iv?: unknown }
+
+export class PasswordValueObject extends ValueObjectEntity<TPasswordValueObjectProps, DictionariesDomain.TDictionariesDomainErrors>
 {
   private readonly __key__: Buffer<ArrayBuffer> = Buffer.from('212230f077bb378f71cba3e5962db6345238f986eb2e04904642f5d33863c306', 'hex')
+  private readonly __ivLength__: number = 16
 
-  protected check(): null | BaseError 
+  protected check(): null | BaseError<DictionariesDomain.TDictionariesDomainErrors>
   {
-    const passIsAlreadyCryptographic = this.checkCryptographic(this.getProps().value)
+    const passIsAlreadyCryptographic = this.checkCryptographic(this.getValue("password"))
     if (passIsAlreadyCryptographic) return null
 
-    const pass = this.getProps().value.length
+    const pass = this.getValue("password")?.length ?? 0
     if (pass < 8)
     {
-      return new InvalidPasswordError('Password must have at least 8 characters')
+      return new DomainErrors.InvalidPasswordError(
+        "Password must have at least 8 characters",
+        "The password informed is too short",
+        this.getValue("lang")
+      )
     }
 
-    if (!/[A-Z]/.test(this.getProps().value))
+    if (!/[A-Z]/.test(this.getValue("password")))
     {
-      return new InvalidPasswordError('Password must contain at least one uppercase letter')
+      return new DomainErrors.InvalidPasswordError(
+        "Password must contain at least one uppercase letter",
+        "The password informed must have at least one uppercase letter",
+        this.getValue("lang")
+      )
     }
 
-    if (!/[a-z]/.test(this.getProps().value))
+    if (!/[a-z]/.test(this.getValue("password")))
     {
-      return new InvalidPasswordError('Password must contain at least one lowercase letter')
+      return new DomainErrors.InvalidPasswordError(
+        "Password must contain at least one lowercase letter",
+        "The password informed must have at least one lowercase letter",
+        this.getValue("lang")
+      )
     }
 
-    if (!/[0-9]/.test(this.getProps().value))
+    if (!/[0-9]/.test(this.getValue("password")))
     {
-      return new InvalidPasswordError('Password must contain at least one number')
+      return new DomainErrors.InvalidPasswordError(
+        "Password must contain at least one number",
+        "The password informed must have at least one number",
+        this.getValue("lang")
+      )
     }
 
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(this.getProps().value))
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(this.getValue("password")))
     {
-      return new InvalidPasswordError('Password must contain at least one special character')
+      return new DomainErrors.InvalidPasswordError(
+        "Password must contain at least one special character",
+        "The password informed must have at least one special character",
+        this.getValue("lang")
+      )
     }
 
     return null
@@ -43,46 +68,140 @@ export class PasswordValueObject extends ValueObjectEntity<{ value: string, iv?:
 
   private checkCryptographic(value: string): boolean
   {
-
-    const iv = this.getIV().toString('hex')
-
-    const hexPattern = /^[0-9a-fA-F]+$/
-    const isDataValid = typeof value === 'string' && hexPattern.test(value)
-    const isIvValid = typeof iv === 'string' && iv.length === 32 && hexPattern.test(iv)
+    const iv = this.normalizeIV(this.getValue('iv'))
+    const isDataValid = this.isHexValue(value) && value.length % (this.__ivLength__ * 2) === 0
+    const isIvValid = iv?.length === this.__ivLength__
   
     return isIvValid && isDataValid
   }
 
-  public getValue(): string
+  private isHexValue(value: string): boolean
   {
-    return this.getProps().value
+    return typeof value === 'string' && value.length > 0 && value.length % 2 === 0 && /^[0-9a-fA-F]+$/.test(value)
+  }
+
+  private normalizeIV(value: unknown): Buffer<ArrayBufferLike> | null
+  {
+    if (!value) return null
+
+    if (Buffer.isBuffer(value))
+    {
+      if (value.length === this.__ivLength__) return value
+
+      const utf8Value = value.toString('utf8')
+      if (this.isHexValue(utf8Value))
+      {
+        const hexBuffer = Buffer.from(utf8Value, 'hex')
+        if (hexBuffer.length === this.__ivLength__) return hexBuffer
+      }
+
+      return null
+    }
+
+    if (value instanceof Uint8Array)
+    {
+      const typedArrayBuffer = Buffer.from(value)
+      return typedArrayBuffer.length === this.__ivLength__ ? typedArrayBuffer : null
+    }
+
+    if (value instanceof ArrayBuffer)
+    {
+      const arrayBuffer = Buffer.from(value)
+      return arrayBuffer.length === this.__ivLength__ ? arrayBuffer : null
+    }
+
+    if (typeof value === 'string')
+    {
+      const stringValue = value
+      const trimmedValue = value.trim()
+      if (!stringValue) return null
+
+      if (this.isHexValue(trimmedValue))
+      {
+        const hexBuffer = Buffer.from(trimmedValue, 'hex')
+        if (hexBuffer.length === this.__ivLength__) return hexBuffer
+      }
+
+      if (trimmedValue.startsWith('{') && trimmedValue.endsWith('}'))
+      {
+        try
+        {
+          return this.normalizeIV(JSON.parse(trimmedValue))
+        } catch
+        {
+          return null
+        }
+      }
+
+      if (/^[A-Za-z0-9+/=]+$/.test(trimmedValue))
+      {
+        const base64Buffer = Buffer.from(trimmedValue, 'base64')
+        if (base64Buffer.length === this.__ivLength__) return base64Buffer
+      }
+
+      const latin1Buffer = Buffer.from(stringValue, 'latin1')
+      return latin1Buffer.length === this.__ivLength__ ? latin1Buffer : null
+    }
+
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      'type' in value &&
+      value.type === 'Buffer' &&
+      'data' in value &&
+      Array.isArray(value.data)
+    )
+    {
+      const objectBuffer = Buffer.from(value.data)
+      return objectBuffer.length === this.__ivLength__ ? objectBuffer : null
+    }
+
+    return null
   }
 
   public encryptPassword(): void
   {
-    const passIsAlreadyCryptographic = this.checkCryptographic(this.getProps().value)
+    const val = this.getValue<string>("password")
+    const passIsAlreadyCryptographic = this.checkCryptographic(this.getValue("password"))
     if (passIsAlreadyCryptographic) return void null
 
     const iv = this.getIV()
     const cipher = createCipheriv('aes-256-cbc', this.__key__, iv)
-    let encrypted = cipher.update(this.getProps().value, 'utf8', 'hex')
+    let encrypted = cipher.update(val, 'utf8', 'hex')
     encrypted += cipher.final('hex')
 
-    this.setValue('iv', iv)
-    this.setValue('value', encrypted)
+    this.setValue('iv', iv.toString('hex'))
+    this.setValue('password', encrypted)
   }
 
-  public getIV(): string | Buffer<ArrayBufferLike>
+  public getIV(): Buffer<ArrayBufferLike>
   {
-    return this.getProps()?.iv ?? randomBytes(16) 
+    return this.normalizeIV(this.getValue('iv')) ?? randomBytes(this.__ivLength__)
+  }
+
+  public getIVAsHex(): string
+  {
+    return this.getIV().toString('hex')
   }
 
   public comparePassword(currentInsertedPassword: string): boolean
   {
-    const decipher = createDecipheriv('aes-256-cbc', this.__key__, this.getIV())
-    let decrypted = decipher.update(this.getProps().value, 'hex', 'utf8')
-    decrypted += decipher.final('utf8')
+    const val = this.getValue<string>("password")
+    if (!this.checkCryptographic(val))
+    {
+      return val === currentInsertedPassword
+    }
 
-    return decrypted === currentInsertedPassword
+    try
+    {
+      const decipher = createDecipheriv('aes-256-cbc', this.__key__, this.getIV())
+      let decrypted = decipher.update(val, 'hex', 'utf8')
+      decrypted += decipher.final('utf8')
+
+      return decrypted === currentInsertedPassword
+    } catch
+    {
+      return false
+    }
   }
 }
