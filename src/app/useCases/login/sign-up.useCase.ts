@@ -1,4 +1,4 @@
-import { BaseSuccess, Environment, Languages, Result } from '@christiangsn/templates_shared'
+import { BaseSuccess, Environment, Result } from '@christiangsn/templates_shared'
 import type { IDTOValues, IHttpClient, ILanguages } from '@christiangsn/templates_shared/build/interfaces'
 
 import type { ISessionRepository } from '../../../domain/contracts/session-repo.contract'
@@ -23,6 +23,7 @@ import { ApplicationErrors } from '@app/errors/errors'
 import { IContractTermsRepository } from '@domain/contracts/contractTerms-repo.contract'
 import { TransferServices, WithDependencies } from '@christiangsn/templates_shared/build/common/transferServices'
 import { IUrlServicesEnv } from '@domain/env/urlServices'
+import { resolveLanguagePreference } from '@shared/utils/language.util'
 
 export type SignUpUseCaseInjectos = {
   readonly veriricationRepository: IVerificationRepository,
@@ -46,10 +47,12 @@ export class SignUpUseCase extends TransferServices<SignUpUseCaseInjectos> imple
 
   protected async execute(dto: IDTOValues<SignUpUseCase.DTO>): Promise<Result<{ message: string, token: string, userId: string }>>
   {
+    const language = resolveLanguagePreference(dto.lang ?? dto.language)
+
     if (!dto.terms) return Result.decline(new ApplicationErrors.NotAcceptTermsError(
       "Not accepted terms",
       "You must accept the terms and conditions to register.",
-      dto?.language ?? Languages.enUS.value
+      language
     ))
 
     const emailAlreadyExists = await this.userRepository.findByEmail(dto.email)
@@ -58,15 +61,15 @@ export class SignUpUseCase extends TransferServices<SignUpUseCaseInjectos> imple
       return Result.decline(new ApplicationErrors.EmailAlreadyExistsError(
         "Email already exists",
         "The email provided is already associated with another account.",
-        dto?.language ?? Languages.enUS.value
+        language
       ))
     }
 
     const email = EmailValueObject.Create({
       email: dto.email,
-    }, dto?.language ?? Languages.enUS.value)
-    const password = PasswordValueObject.Create({ password: dto.password }, dto?.language ?? Languages.enUS.value)
-    const dateOfBirth = DateOfBirthValueObject.Create({ dateOfBirth: dto.dateOfBirth }, dto?.language ?? Languages.enUS.value)
+    }, language)
+    const password = PasswordValueObject.Create({ password: dto.password }, language)
+    const dateOfBirth = DateOfBirthValueObject.Create({ dateOfBirth: dto.dateOfBirth }, language)
 
     const values = [email, password, dateOfBirth]
     for (const value of values) 
@@ -90,7 +93,7 @@ export class SignUpUseCase extends TransferServices<SignUpUseCaseInjectos> imple
     const newUser = UserEntity.Create(
       {
         dateOfBirth: dateOfBirth.getResult().getOutput().payload,
-        lang: dto.language,
+        lang: language,
         email: email.getResult().getOutput().payload,
         password: password.getResult().getOutput().payload,
         fullName: dto.fullName,
@@ -109,7 +112,7 @@ export class SignUpUseCase extends TransferServices<SignUpUseCaseInjectos> imple
       return Result.decline(new ApplicationErrors.ContractTermsNotFoundError(
         "Contract terms not found",
         "No active contract terms version is available for sign up.",
-        dto?.language ?? Languages.enUS.value
+        language
       ))
     }
 
@@ -178,6 +181,7 @@ export namespace SignUpUseCase
       userAgent: string;
       ipAddress: string;
       language?: ILanguages.LanguageValues;
+      lang?: ILanguages.LanguageValues;
       terms: Omit<AcceptTermsUseCase.DTO, 'userId'>
   }
 }

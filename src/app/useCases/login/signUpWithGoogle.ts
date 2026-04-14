@@ -11,6 +11,7 @@ import type { VerificationProps } from '@domain/entities';
 import { DateOfBirthValueObject } from '@domain/valuesObjects/dateOfBirth.ValueObject';
 import { EmailValueObject } from '@domain/valuesObjects/email.valueObjec';
 import { PasswordValueObject } from '@domain/valuesObjects/password.ValueObject';
+import { resolveLanguagePreference } from '@shared/utils/language.util';
 
 export type SignUpWithGoogleInjectos = {
   readonly userRepository: IUserRepository,
@@ -33,10 +34,11 @@ export class SignUpWithGoogle extends TransferServices<SignUpWithGoogleInjectos>
 
   protected async execute (dto: IDTOValues<SignUpWithGoogleDTO>): Promise<IResult<SignUpWithGoogle.Output>>
   {
+    const language = resolveLanguagePreference(dto.lang ?? dto.language)
     const googleAccount = await this.googleRepositoy.getUserByToken(dto.idToken)
     if (!googleAccount)
     {
-      return Result.decline(new ApplicationErrors.InvalidGoogleTokenError("Your token google is not authorized or not valid", "The provided Google token is invalid or unauthorized.", dto.lang))
+      return Result.decline(new ApplicationErrors.InvalidGoogleTokenError("Your token google is not authorized or not valid", "The provided Google token is invalid or unauthorized.", language))
     }
 
     const userAlreadyExists = await this.userRepository.findByEmail(googleAccount.email)
@@ -47,13 +49,13 @@ export class SignUpWithGoogle extends TransferServices<SignUpWithGoogleInjectos>
     } else {
       const password = PasswordValueObject.Create(
         { password: `Google!${Date.now()}Aa1` },
-        dto.lang
+        language
       ).getResult().getOutput().payload
 
       newUser = UserEntity.Create({
         email: EmailValueObject.Create({ email: googleAccount.email }).getResult().getOutput().payload,
         password,
-        lang: dto.lang,
+        lang: language,
         fullName: googleAccount.fullName,
         phoneNumber: null,
         dateOfBirth: DateOfBirthValueObject.Create({ dateOfBirth: googleAccount.dateOfBirth }).getResult().getOutput().payload,

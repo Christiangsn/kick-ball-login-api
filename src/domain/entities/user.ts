@@ -35,6 +35,11 @@ export class UserEntity extends DomainEntity<UserEntityProps, DictionariesDomain
   {
     return null
   }
+
+  public getLang(): ILanguages.LanguageValues
+  {
+    return this.getProps().lang ?? ILanguages.LanguageValues.PT_BR
+  }
     
   public setVerified(): void
   {

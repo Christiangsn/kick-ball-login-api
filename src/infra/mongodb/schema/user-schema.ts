@@ -1,3 +1,4 @@
+import { ILanguages } from '@christiangsn/templates_shared/build/interfaces'
 import { schemaDef, required, field, dateField } from 'mongoose-decorators-ts'
 
 import { EnumGender } from '../../../domain/entities/user'
@@ -27,6 +28,9 @@ export class UserSchema
 
     @required({ type: String })
     public dateOfBirth!: string
+
+    @field({ type: String, enum: ILanguages.LanguageValues, default: ILanguages.LanguageValues.PT_BR })
+    public lang!: ILanguages.LanguageValues
 
     @field({ type: String, enum: EnumGender, default: EnumGender.PreferNotToSay  })
     public gender!: EnumGender

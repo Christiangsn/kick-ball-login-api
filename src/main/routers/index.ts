@@ -5,7 +5,7 @@ import { HttpBuilder } from "@infra/httpServer/build/http.payload";
 import { JsonResponser } from "@infra/httpServer/middleware/response/json.responser";
 import { IncomingMessage, ServerResponse } from "http";
 import { IRegisterRouter } from "@infra/httpServer/interfaces/http-register-router.interface";
-import { GetUserAgentMiddleware, GetIPMiddleware } from "@infra/httpServer/middleware";
+import { GetCurrentLangMiddleware, GetUserAgentMiddleware, GetIPMiddleware } from "@infra/httpServer/middleware";
 import { ChangePasswordDTO } from "@app/dto/changePassword.dto";
 import { HtmlResponser } from "@infra/httpServer/middleware/response/html.responser";
 import { ChangePasswordControllerFactory } from "@main/factories/controllers/changePassword.factory";
@@ -28,7 +28,7 @@ export class Routers
   {
     const signUpWithGoogleRouter = new HttpRouter<IncomingMessage, ServerResponse, {}>(
       new HttpRoute(IHttpVerbs.POST, '/users/signup/google', 1), 
-      [new GetIPMiddleware(), new GetUserAgentMiddleware()], 
+      [new GetCurrentLangMiddleware(), new GetIPMiddleware(), new GetUserAgentMiddleware()], 
       [], 
       {
         payload: new HttpBuilder(SignUpWithGoogleDTO),
@@ -40,7 +40,7 @@ export class Routers
 
     const signupRouter = new HttpRouter<IncomingMessage, ServerResponse, {}>(
       new HttpRoute(IHttpVerbs.POST, '/users/signup', 1), 
-      [new GetIPMiddleware(), new GetUserAgentMiddleware()], 
+      [new GetCurrentLangMiddleware(), new GetIPMiddleware(), new GetUserAgentMiddleware()], 
       [], 
       {
         payload: new HttpBuilder(SignUpDTO),
@@ -52,7 +52,7 @@ export class Routers
 
     const changePassword = new HttpRouter<IncomingMessage, ServerResponse, string>(
       new HttpRoute(IHttpVerbs.GET, '/users/change-password', 1), 
-      [new GetIPMiddleware(), new GetUserAgentMiddleware()], 
+      [new GetCurrentLangMiddleware(), new GetIPMiddleware(), new GetUserAgentMiddleware()], 
       [new FrameOptionsHeadersMiddleware("http://localhost:4545")],
       {
         payload: new HttpBuilder(ChangePasswordDTO),
@@ -64,7 +64,7 @@ export class Routers
 
     const SignIn = new HttpRouter<IncomingMessage, ServerResponse, {}>(
       new HttpRoute(IHttpVerbs.POST, '/users/sign-in', 1), 
-      [new GetIPMiddleware(), new GetUserAgentMiddleware()], 
+      [new GetCurrentLangMiddleware(), new GetIPMiddleware(), new GetUserAgentMiddleware()], 
       [], 
       {
         payload: new HttpBuilder(SignInDTO),
@@ -76,7 +76,7 @@ export class Routers
 
     const getInfo = new HttpRouter<IncomingMessage, ServerResponse, {}>(
       new HttpRoute(IHttpVerbs.GET, '/users/get-information', 1), 
-      [new GetIPMiddleware(), new GetUserAgentMiddleware()], 
+      [new GetCurrentLangMiddleware(), new GetIPMiddleware(), new GetUserAgentMiddleware()], 
       [], 
       {
         payload: new HttpBuilder(GetUserInformationDTO),

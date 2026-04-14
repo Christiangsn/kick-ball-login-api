@@ -1,3 +1,4 @@
+import { resolveLanguagePreference } from '@shared/utils/language.util'
 import { UserEntity } from '../../../domain/entities/user'
 import { DateOfBirthValueObject } from '../../../domain/valuesObjects/dateOfBirth.ValueObject'
 import { EmailValueObject } from '../../../domain/valuesObjects/email.valueObjec'
@@ -13,7 +14,7 @@ export class UserMapper
       {
         email: EmailValueObject.Create({ email: user.email }).getResult().getOutput().payload,
         password: PasswordValueObject.Create({ password: user.password, iv: user.cryptoIVPassword }).getResult().getOutput().payload,
-        lang: undefined,
+        lang: resolveLanguagePreference(user.lang),
         phoneNumber: user.phoneNumber ? PhoneNumberValueObject.Create({ value: user.phoneNumber }).getResult().getOutput().payload : null,
         fullName: user.name,
         dateOfBirth: DateOfBirthValueObject.Create({ dateOfBirth: user.dateOfBirth }).getResult().getOutput().payload,
@@ -34,6 +35,7 @@ export class UserMapper
     persistence.name = user.getFullName()
     persistence.phoneNumber = user.getPhoneNumber()?.getValue("value") ?? null
     persistence.dateOfBirth = user.getDateOfBirth().getValue("dateOfBirth")
+    persistence.lang = user.getLang()
     persistence.gender = user.getGender()
     persistence.isVerified = user.getIsVerified()
     persistence.isActive = user.getIsActive()

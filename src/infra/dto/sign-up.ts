@@ -1,4 +1,4 @@
-import { InjectDTO, isEnumerable, isRequired, isString } from '@christiangsn/templates_shared'
+import { ILanguages, InjectDTO, isEnumerable, isRequired, isString } from '@christiangsn/templates_shared'
 import { DTOEntity  } from '@christiangsn/templates_shared/build/common/baseDTO'
 
 import type { SignUpUseCase } from '../../app/useCases/login/sign-up.useCase'
@@ -39,4 +39,10 @@ export class SignUpDTO extends DTOEntity implements SignUpUseCase.DTO
 
   @isRequired()
   public userAgent!: string
+
+  @isEnumerable(ILanguages.LanguageValues)
+  public language?: ILanguages.LanguageValues
+
+  @isEnumerable(ILanguages.LanguageValues)
+  public lang?: ILanguages.LanguageValues
 }

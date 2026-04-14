@@ -1,5 +1,6 @@
-import { IHttpRootServer, ILanguages } from '@christiangsn/templates_shared/build/interfaces'
+import { IHttpRootServer } from '@christiangsn/templates_shared/build/interfaces'
 import { IncomingMessage } from 'http';
+import { resolveLanguagePreference } from '@shared/utils/language.util';
 
 export class GetCurrentLangMiddleware implements IHttpRootServer.Router.Middleware<IncomingMessage>
 {
@@ -7,8 +8,13 @@ export class GetCurrentLangMiddleware implements IHttpRootServer.Router.Middlewa
 
   public async intercept(req: IncomingMessage): Promise<void>
   {
-    let lang: ILanguages.LanguageValues | null = req.headers['lang'] as ILanguages.LanguageValues | null;
-    if (!lang) lang = ILanguages.LanguageValues.EN_US;
+    const requestLang = req.headers['lang'] ?? req.headers['accept-language']
+    if (!requestLang)
+    {
+      return
+    }
+
+    const lang = resolveLanguagePreference(requestLang);
 
     req.informations = {
       ...req.informations,
