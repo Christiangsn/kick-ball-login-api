@@ -1,8 +1,8 @@
 import { HttpHeaders, IHttpClient, IResult } from "@christiangsn/templates_shared";
-import axios, { AxiosInstance } from "axios"
+import axios from "axios"
 export class HttpClient implements IHttpClient.Request {
 
-    private readonly _instance: AxiosInstance;
+    private readonly _instance: any;
 
     public constructor () {
         this._instance = axios.create({})
