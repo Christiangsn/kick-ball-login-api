@@ -1,14 +1,12 @@
 import { HttpHeaders, IHttpClient, IResult } from "@christiangsn/templates_shared";
-import axios = require("axios");
-
+import axios, { AxiosInstance } from "axios"
 export class HttpClient implements IHttpClient.Request {
 
-    private readonly _instance: Axios.AxiosInstance;
+    private readonly _instance: AxiosInstance;
 
     public constructor () {
         this._instance = axios.create({})
     }
-
 
     public async get <Payload, ExpectedResponse>(endpoint: string, params: Payload, _headers: Array<keyof HttpHeaders.ResquetHeaders>): Promise<IResult<ExpectedResponse>> {
         const request = await this._instance.get(endpoint, {

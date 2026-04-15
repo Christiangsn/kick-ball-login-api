@@ -1,13 +1,14 @@
 /* eslint-disable no-var */
 import { SignUpWithGoogleDTO } from '@app/dto/signUpWithGoogle.dto';
 import { ApplicationErrors } from '@app/errors/errors';
-import { BaseSuccess, Result } from '@christiangsn/templates_shared'
+import { BaseSuccess, Environment, Result } from '@christiangsn/templates_shared'
 import { TransferServices, WithDependencies } from '@christiangsn/templates_shared/build/common/transferServices';
-import type { IDTOValues } from '@christiangsn/templates_shared/build/interfaces'
+import type { IDTOValues, IHttpClient } from '@christiangsn/templates_shared/build/interfaces'
 import { IResult } from '@christiangsn/templates_shared/build/interfaces/domain/IResult';
 import { ENumSignUpTypesLogin, ISessionRepository, ISignUpExternalRepository, IUserRepository, IVerificationRepository } from '@domain/contracts';
 import { EnumGender, EnumVerificationType, SessionEntity, UserEntity, VerificationEntity } from '@domain/entities';
 import type { VerificationProps } from '@domain/entities';
+import { IUrlServicesEnv } from '@domain/env/urlServices';
 import { DateOfBirthValueObject } from '@domain/valuesObjects/dateOfBirth.ValueObject';
 import { EmailValueObject } from '@domain/valuesObjects/email.valueObjec';
 import { PasswordValueObject } from '@domain/valuesObjects/password.ValueObject';
@@ -18,6 +19,8 @@ export type SignUpWithGoogleInjectos = {
   readonly veriricationRepository: IVerificationRepository,
   readonly sessionRepository: ISessionRepository,
   readonly googleRepositoy: ISignUpExternalRepository<'google'>
+  readonly httpClient: IHttpClient.Request,
+  readonly enrionmentServices: Environment<IUrlServicesEnv>
 }
 
 export namespace SignUpWithGoogle {
@@ -31,6 +34,8 @@ export class SignUpWithGoogle extends TransferServices<SignUpWithGoogleInjectos>
   declare readonly veriricationRepository: IVerificationRepository;
   declare readonly sessionRepository: ISessionRepository;
   declare readonly googleRepositoy: ISignUpExternalRepository<'google'>;
+  declare readonly httpClient: IHttpClient.Request;
+  declare readonly enrionmentServices: Environment<IUrlServicesEnv>
 
   protected async execute (dto: IDTOValues<SignUpWithGoogleDTO>): Promise<IResult<SignUpWithGoogle.Output>>
   {
@@ -88,6 +93,11 @@ export class SignUpWithGoogle extends TransferServices<SignUpWithGoogleInjectos>
     }).getResult().getOutput().payload;
     session.generateNewToken()
     await this.sessionRepository.save(session)
+
+    const gamingService = this.enrionmentServices.getValue("dashGamingUrl")
+    await this.httpClient.post(gamingService + "/private/register-player", {
+      associateId: newUser.getID()
+    }, { } as any)
 
     return Result.success<{ message: string; token: string }>(new BaseSuccess({ 
       message: 'User registered successfully', 

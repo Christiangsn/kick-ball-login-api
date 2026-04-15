@@ -1,12 +1,13 @@
 /* eslint-disable no-var */
 import { SignInDTO } from '@app/dto/signIn.dto';
 import { ApplicationErrors } from '@app/errors/errors';
-import { BaseSuccess, Languages, Result } from '@christiangsn/templates_shared'
+import { BaseSuccess, Environment, Languages, Result } from '@christiangsn/templates_shared'
 import { TransferServices, WithDependencies } from '@christiangsn/templates_shared/build/common/transferServices';
-import type { IDTOValues } from '@christiangsn/templates_shared/build/interfaces'
+import type { IDTOValues, IHttpClient } from '@christiangsn/templates_shared/build/interfaces'
 import { IResult } from '@christiangsn/templates_shared/build/interfaces/domain/IResult';
 import { ENumSignUpTypesLogin, ISessionRepository, ISignUpExternalRepository, IUserRepository, IVerificationRepository } from '@domain/contracts';
 import {  SessionEntity, } from '@domain/entities';
+import { IUrlServicesEnv } from '@domain/env/urlServices';
 import { CryptoDomainService } from '@domain/services/crypto/crypto.domain-service';
 import { PasswordValueObject } from '@domain/valuesObjects/password.ValueObject';
 

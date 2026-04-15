@@ -4,6 +4,8 @@ import { SessionRepoFactory } from "../infra/mongodb/session-repo.factory";
 import { UserRepoFactory } from "../infra/mongodb/user-repo.factory";
 import { SignUpWithGoogle } from "../../../app/useCases/login/signUpWithGoogle";
 import { GoogleRepositoryFactory } from "../infra/google/googleRepository.factory";
+import { HttpClientFactory } from "../infra/httpClient/httpClient.factory";
+import { UrlServicesENv } from "@infra/env/urlServices-env";
 
 export class SignUpWithGoogleUseCaseFactory extends FactoryAdapter<SignUpWithGoogle>
 {
@@ -13,7 +15,11 @@ export class SignUpWithGoogleUseCaseFactory extends FactoryAdapter<SignUpWithGoo
             userRepository: UserRepoFactory.getCompose(),
             sessionRepository: SessionRepoFactory.getCompose(),
             googleRepositoy: GoogleRepositoryFactory.getCompose(),
-            veriricationRepository: VerificationRepoFactory.getCompose()
+            veriricationRepository: VerificationRepoFactory.getCompose(),
+            httpClient: HttpClientFactory.getCompose(),
+            enrionmentServices: new UrlServicesENv({
+                dashGamingUrl: process.env?.DASH_GAMING_BACKEND ?? ""
+            })
         })
     }
 }
