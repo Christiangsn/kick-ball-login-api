@@ -8,6 +8,9 @@ export class SignUpWithGoogleDTO extends DTOEntity
   @isString()
   public idToken!: string
 
+  @isString()
+  public accessToken?: string
+
   @isRequired()
   @isString()
   public userAgent!: string

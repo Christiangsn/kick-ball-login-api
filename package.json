@@ -4,8 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "node --env-file='.env' --inspect=9229 --import tsx src/main/bootstrap/main.ts",
-    "build": "npx tsc -p tsconfig.build.json && npx tsc-alias -p tsconfig.build.json && npm run compact:build",
-    "compact:build": "npx esbuild build/**/*.js --platform=node --outdir=build --target=es2020 --bundle --minify --allow-overwrite --keep-names",
+    "build": "tsc -p tsconfig.build.json --pretty false",
     "build:ui": "vite build",
     "preview:ui": "vite preview",
     "dev:ui": "vite"

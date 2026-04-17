@@ -9,6 +9,7 @@ import { PasswordValueObject } from '../../../domain/valuesObjects/password.Valu
 import { PhoneNumberValueObject } from '../../../domain/valuesObjects/phoneNumber.valueObject'
 import { UserMapper } from '../mappers/user.mapper'
 import { UserSchema } from '../schema/user-schema'
+import { IBasePersistenceFields } from '@christiangsn/templates_shared/build/interfaces/domain/IBaseRepository'
 
 export class UserRepository implements IUserRepository
 {
@@ -39,7 +40,23 @@ export class UserRepository implements IUserRepository
     return this.mapper.toUserEntity(user)
   }
 
-  public async update(id: string, fields: Partial<{ getGender: () => EnumGender; getIsVerified: () => boolean; getIsActive: () => boolean; getPassword: () => PasswordValueObject; getPhoneNumber: () => PhoneNumberValueObject | null; getFullName: () => string; getEmail: () => EmailValueObject; getDateOfBirth: () => DateOfBirthValueObject; getID: () => string; createAt: () => Date; updateAt: () => Date; deleteAt: () => Date | null; }>): Promise<void> {
-    throw new Error('Method not implemented.')
+  public async update(id: string, fields: IBasePersistenceFields<UserEntity>): Promise<void> {
+    const updateFields: Partial<UserSchema> = {}
+
+    if (fields.getGender) updateFields.gender = fields.getGender()
+    if (fields.getIsVerified) updateFields.isVerified = fields.getIsVerified()
+    if (fields.getIsActive) updateFields.isActive = fields.getIsActive()
+    if (fields.getFullName) updateFields.name = fields.getFullName()
+    if (fields.getEmail) updateFields.email = fields.getEmail().getValue("email")
+    if (fields.getDateOfBirth) updateFields.dateOfBirth = fields.getDateOfBirth().getValue("dateOfBirth")
+    if (fields.getPhoneNumber) updateFields.phoneNumber = fields.getPhoneNumber()?.getValue("value") ?? null
+    if (fields.getPassword) {
+      updateFields.password = fields.getPassword().getValue("password")
+      updateFields.cryptoIVPassword = fields.getPassword().getIVAsHex()
+    }
+
+    if (Object.keys(updateFields).length === 0) return
+
+    await this.modelConn.updateOne({ id }, { $set: updateFields })
   }
 }

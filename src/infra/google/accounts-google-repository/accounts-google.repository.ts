@@ -11,7 +11,6 @@ import { ENumSignUpTypesLogin } from '@domain/contracts';
 export class AccountsGoogleRepository implements ISignUpExternalRepository<'google'>
 {
   private readonly __googleClient__: OAuth2Client
-  private readonly __peopleAPIService__: GooglePeopleAPIService
 
   public constructor (
     private readonly googleEnvironment: Environment<IOAuthGoogleEnv>
@@ -21,26 +20,46 @@ export class AccountsGoogleRepository implements ISignUpExternalRepository<'goog
       clientId: this.googleEnvironment.getValue('clientId'),
       clientSecret: this.googleEnvironment.getValue('clientSecret')
     })
-
-    this.__peopleAPIService__ = new GooglePeopleAPIService(this.__googleClient__ as unknown as APIOAuth)
   }
 
-  public async getUserByToken(tokenId: string): Promise<ISignUpExternalRepository.IGetUserByTokenResponse> {
+  public async getUserByToken(tokenId: string, accessToken?: string): Promise<ISignUpExternalRepository.IGetUserByTokenResponse> {
     const client: LoginTicket = await this.__googleClient__.verifyIdToken({
-      idToken: tokenId
+      idToken: tokenId,
+      audience: this.googleEnvironment.getValue('clientId')
     })
 
     const payload: TokenPayload | undefined = client.getPayload()
     if (!payload) return null
 
     const { email, name } = payload
-    const { birthdays } = await this.__peopleAPIService__.getPeopleInformations(['birthdays'])
+    let dateOfBirth: string | null = null
+
+    if (accessToken) {
+      try {
+        const peopleClient = new OAuth2Client({
+          clientId: this.googleEnvironment.getValue('clientId'),
+          clientSecret: this.googleEnvironment.getValue('clientSecret')
+        })
+
+        peopleClient.setCredentials({ access_token: accessToken })
+
+        const peopleAPIService = new GooglePeopleAPIService(peopleClient as unknown as APIOAuth)
+        const { birthdays } = await peopleAPIService.getPeopleInformations(['birthdays'])
+        const birthday = birthdays?.[0]?.date
+
+        if (birthday?.year && birthday?.month && birthday?.day) {
+          dateOfBirth = `${birthday.year}-${String(birthday.month).padStart(2, '0')}-${String(birthday.day).padStart(2, '0')}`
+        }
+      } catch {
+        dateOfBirth = null
+      }
+    }
 
     return {
       email,
       fullName: name,
       phoneNumber: null,
-      dateOfBirth: birthdays[0].text,
+      dateOfBirth,
       expiresDate: 0,
       referenceName: ENumSignUpTypesLogin.GOOGLE
     }

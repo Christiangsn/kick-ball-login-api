@@ -40,18 +40,37 @@ export class SignUpWithGoogle extends TransferServices<SignUpWithGoogleInjectos>
   protected async execute (dto: IDTOValues<SignUpWithGoogleDTO>): Promise<IResult<SignUpWithGoogle.Output>>
   {
     const language = resolveLanguagePreference(dto.lang ?? dto.language)
-    const googleAccount = await this.googleRepositoy.getUserByToken(dto.idToken)
+    const googleAccount = await this.googleRepositoy.getUserByToken(dto.idToken, dto.accessToken)
+    let isNewUser = false
+
     if (!googleAccount)
     {
       return Result.decline(new ApplicationErrors.InvalidGoogleTokenError("Your token google is not authorized or not valid", "The provided Google token is invalid or unauthorized.", language))
     }
 
     const userAlreadyExists = await this.userRepository.findByEmail(googleAccount.email)
+    const shouldMarkVerified = !!userAlreadyExists && !userAlreadyExists.getIsVerified()
+
     if (userAlreadyExists) 
     {
-      userAlreadyExists.setVerified()
       var newUser = userAlreadyExists
+      if (shouldMarkVerified) {
+        await this.userRepository.update(newUser.getID(), {
+          getIsVerified: () => true
+        } as Partial<UserEntity>)
+      }
     } else {
+      isNewUser = true
+
+      if (!googleAccount.dateOfBirth)
+      {
+        return Result.decline(new ApplicationErrors.InvalidGoogleTokenError(
+          "Google access token is required to read the user's birth date",
+          "The provided Google token is missing profile permissions required to create the user.",
+          language
+        ))
+      }
+
       const password = PasswordValueObject.Create(
         { password: `Google!${Date.now()}Aa1` },
         language
@@ -77,7 +96,7 @@ export class SignUpWithGoogle extends TransferServices<SignUpWithGoogleInjectos>
       userId: newUser.getID(),
       verificationCode: undefined,
       verificationType: EnumVerificationType.Email,
-      isVerify: newUser.getIsVerified(),
+      isVerify: shouldMarkVerified ? true : newUser.getIsVerified(),
       expiresAt: googleAccount.expiresDate
     }
 
@@ -94,10 +113,12 @@ export class SignUpWithGoogle extends TransferServices<SignUpWithGoogleInjectos>
     session.generateNewToken()
     await this.sessionRepository.save(session)
 
-    const gamingService = this.enrionmentServices.getValue("dashGamingUrl")
-    await this.httpClient.post(gamingService + "/private/register-player", {
-      associateId: newUser.getID()
-    }, { } as any)
+    if (isNewUser) {
+      const gamingService = this.enrionmentServices.getValue("dashGamingUrl")
+      await this.httpClient.post(gamingService + "/private/register-player", {
+        associateId: newUser.getID()
+      }, { } as any)
+    }
 
     return Result.success<{ message: string; token: string }>(new BaseSuccess({ 
       message: 'User registered successfully', 
